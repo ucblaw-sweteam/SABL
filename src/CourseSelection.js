@@ -8,6 +8,9 @@ import Favourite from "./Favourite";
 import { Button } from "@material-ui/core";
 import axios from "axios";
 import TextField from "@material-ui/core/TextField";
+import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import { SportsOutlined } from "@material-ui/icons";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,6 +52,7 @@ function CourseSelection({ user, setView }) {
   const [qOne, setQone] = React.useState("");
   const [qTwo, setQtwo] = React.useState("");
   const [qThree, setQthree] = React.useState("");
+  const [pushDown, setPushDown] = React.useState(false);
 
   const handleSubmit = () => {
     const data = {
@@ -62,6 +66,39 @@ function CourseSelection({ user, setView }) {
         console.log(response);
         setView("Thanks");
       });
+  };
+
+  const handlePushDownSelect = (y, spot, e) => {
+    let temp = [...selected];
+
+    if (!e.target.checked) {
+      temp[spot] = null;
+    } else {
+      if (selected.includes(y)) {
+        temp[selected.indexOf(y)] = null;
+      }
+      if (temp[spot] == null || (temp[spot] == undefined && spot <= 4)) {
+        temp[spot] = y;
+      } else {
+        let a = temp[spot];
+        temp[spot] = null;
+        for (let i = spot; i < temp.length; i++) {
+          if (temp[i + 1] == null) {
+            temp[i + 1] = a;
+            break;
+          }
+          let b = temp[i + 1];
+          temp[i + 1] = a;
+          a = b;
+        }
+        temp[spot] = y;
+      }
+    }
+    if (temp.length > 5) {
+      let newFav = [...favourite, temp.splice(5)];
+      setFavourite(newFav);
+    }
+    setSelected(temp);
   };
 
   const handleSelect = (y, spot, e) => {
@@ -106,7 +143,9 @@ function CourseSelection({ user, setView }) {
             <AllCourses
               favourite={favourite}
               courses={courses}
-              handleSelect={handleSelect}
+              handleSelect={
+                pushDown == true ? handlePushDownSelect : handleSelect
+              }
               handleFavourite={handleFavourite}
               selected={selected}
             />
@@ -114,6 +153,19 @@ function CourseSelection({ user, setView }) {
         </Grid>
         <Grid item xs={12} sm={3}>
           <Paper className={classes.paper}>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={pushDown}
+                  onChange={(e) =>
+                    e.target.checked ? setPushDown(true) : setPushDown(false)
+                  }
+                  name="checkedB"
+                  color="primary"
+                />
+              }
+              label="Push Down Selection System"
+            />
             <TopFive selected={selected} />
           </Paper>
         </Grid>
