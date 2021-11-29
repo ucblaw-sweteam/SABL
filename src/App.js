@@ -1,25 +1,21 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import CourseSelection from "./CourseSelection";
+import Login from "./Login";
+import ThankYou from "./ThankYou";
+export default function App() {
+  const [user, setUser] = React.useState(null);
+  const [view, setView] = React.useState("survey");
+  let mode;
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  if (user == null) {
+    mode = <Login setUser={setUser} />;
+  } else {
+    mode =
+      view === "survey" ? (
+        <CourseSelection user={user} setView={setView} />
+      ) : (
+        <ThankYou />
+      );
+  }
+  return mode;
 }
-
-export default App;
